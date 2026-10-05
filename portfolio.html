@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Erika Stekerhofa · The Goddess Movement</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --sand:#f2e8d9;--sand-dark:#e0cdb3;--cream:#faf7f2;--parchment:#f5ede0;
+      --stone:#c9b89a;--driftwood:#a08060;--bark:#5c3d2e;--ocean:#7a9a8a;
+      --gold:#c9a84c;--gold-light:#e8d4a0;--white:#ffffff;
+      --text:#3d2b1f;--text-soft:#7a6050;
+    }
+    html,body{width:100%;height:100%;overflow:hidden;font-family:'Jost',sans-serif;color:var(--text);}
+
+    /* ── PRESENTATION ── */
+    .deck{position:relative;width:100vw;height:100vh;overflow:hidden;background:#1a1208;}
+
+    /* ── SLIDES ── */
+    .slide{
+      position:absolute;inset:0;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      padding:3rem 5rem 3.5rem;
+      opacity:0;transform:translateX(100%);
+      transition:transform .6s cubic-bezier(.4,0,.2,1),opacity .6s ease;
+      pointer-events:none;overflow-x:hidden;overflow-y:auto;
+    }
+    .slide.active{opacity:1;transform:translateX(0);pointer-events:all;}
+
+    .slide--dark{background:linear-gradient(160deg,#1a1208 0%,#2e1f0e 35%,#3d2b1f 60%,#5c3d2e 100%);}
+    .slide--light{background:var(--cream);}
+    .slide--parchment{background:var(--parchment);}
+
+    /* ── NAV BUTTONS ── */
+    .nav-btn{
+      position:fixed;top:50%;transform:translateY(-50%);z-index:300;
+      width:42px;height:42px;border-radius:50%;
+      border:1px solid rgba(92,61,46,.2);background:rgba(250,247,242,.85);
+      backdrop-filter:blur(6px);cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      color:var(--bark);transition:all .2s;
+    }
+    .nav-btn:hover{background:rgba(92,61,46,.12);}
+    .nav-btn.off{opacity:.15;pointer-events:none;}
+    .nav-btn svg{width:14px;height:14px;}
+    #prevBtn{left:1.25rem;}
+    #nextBtn{right:1.25rem;}
+    body.dark-ui .nav-btn{background:rgba(255,255,255,.07);border-color:rgba(201,168,76,.3);color:var(--sand);}
+    body.dark-ui .nav-btn:hover{background:rgba(255,255,255,.13);}
+
+    /* ── DOTS ── */
+    .dots{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:300;display:flex;gap:.5rem;align-items:center;}
+    .dot{width:6px;height:6px;border-radius:50%;background:var(--stone);opacity:.35;cursor:pointer;transition:all .25s;border:none;padding:0;}
+    .dot.on{opacity:1;background:var(--gold);transform:scale(1.4);}
+    body.dark-ui .dot{background:var(--sand-dark);}
+    body.dark-ui .dot.on{background:var(--gold);opacity:1;}
+
+    /* ── COUNTER ── */
+    #counter{position:fixed;bottom:1.4rem;right:2rem;z-index:300;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--stone);opacity:.55;}
+    body.dark-ui #counter{color:var(--stone);}
+
+    /* ── SHARED ── */
+    .inner{width:100%;max-width:1100px;}
+    .s-title{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(1.7rem,3vw,2.5rem);color:var(--bark);line-height:1.2;margin-bottom:.7rem;}
+    .s-sub{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:.95rem;color:var(--text-soft);margin-bottom:1.1rem;letter-spacing:.04em;}
+    .s-rule{width:42px;height:2px;background:var(--gold);margin-bottom:1.75rem;}
+
+    /* ── SLIDE 1: COVER ── */
+    .hero-moon{width:68px;height:68px;margin-bottom:1.5rem;animation:fl 6s ease-in-out infinite;}
+    @keyframes fl{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .h-tag{font-size:.7rem;font-weight:400;letter-spacing:.35em;text-transform:uppercase;color:var(--gold-light);margin-bottom:1.1rem;display:block;}
+    .h-name{font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(2rem,5vw,3.6rem);color:var(--white);line-height:1.05;margin-bottom:.35rem;}
+    .h-role{font-family:'Cormorant Garamond',serif;font-style:normal;font-weight:300;font-size:clamp(1rem,2.2vw,1.5rem);color:var(--sand);letter-spacing:.05em;margin-bottom:1.4rem;}
+    .h-div{width:48px;height:1px;background:var(--gold);margin:0 auto 1.4rem;}
+    .h-sub{font-size:.72rem;font-weight:400;letter-spacing:.2em;text-transform:uppercase;color:var(--stone);margin-bottom:1.1rem;display:block;}
+    .h-desc{font-family:'Cormorant Garamond',serif;font-style:normal;font-weight:300;font-size:clamp(1rem,2.2vw,1.5rem);letter-spacing:.05em;color:var(--sand-dark);line-height:1.75;text-align:center;}
+
+    /* ── SLIDE 2: ABOUT ── */
+    .about-grid{display:grid;grid-template-columns:1.3fr .7fr;gap:3.5rem;align-items:start;}
+    .a-intro{font-family:'Cormorant Garamond',serif;font-size:1.2rem;font-weight:300;font-style:italic;line-height:1.7;color:var(--bark);margin-bottom:1.1rem;}
+    .a-body{font-size:.83rem;font-weight:300;line-height:1.85;color:var(--text-soft);}
+    .a-body+.a-body{margin-top:.85rem;}
+    .stat-col{display:flex;flex-direction:column;gap:1.1rem;}
+    .stat-item{border-left:2px solid var(--gold);padding-left:1rem;}
+    .stat-num{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;color:var(--bark);line-height:1;display:inline;margin-right:.25rem;}
+    .stat-lbl{font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--driftwood);display:inline;}
+    .stat-sub{font-size:.72rem;color:var(--driftwood);display:block;margin-top:.15rem;font-style:italic;}
+
+    /* ── SLIDE 3: WHAT I BRING ── */
+    .bring-grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:4rem;align-items:center;}
+    .bring-left{display:flex;flex-direction:column;gap:1rem;align-items:flex-start;}
+    .bring-wave{opacity:.3;margin-top:.5rem;}
+    .bring-list{list-style:none;display:flex;flex-direction:column;gap:.8rem;}
+    .bring-list li{font-size:.87rem;font-weight:300;line-height:1.65;color:var(--text-soft);padding-left:1.15rem;position:relative;}
+    .bring-list li::before{content:'—';position:absolute;left:0;color:var(--gold);}
+
+    /* ── SLIDE 4: SKILLS ── */
+    .cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;}
+    .pk{background:var(--white);border-radius:4px;padding:1.35rem 1.1rem;border-top:3px solid var(--gold);}
+    .pk-icon{width:34px;height:34px;margin-bottom:.85rem;color:var(--ocean);}
+    .pk-h{font-family:'Cormorant Garamond',serif;font-size:1.28rem;font-weight:600;color:var(--bark);margin-bottom:.55rem;letter-spacing:.03em;}
+    .pk-tags{display:flex;flex-wrap:wrap;gap:.3rem;}
+    .pk-tag{font-size:.62rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;background:var(--parchment);color:var(--driftwood);border-radius:2px;padding:.18rem .45rem;}
+    .skills-footer{margin-top:1.4rem;padding:1.1rem 2rem;background:linear-gradient(135deg,var(--bark),#3d2b1f);border-radius:4px;color:var(--sand);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(.85rem,1.8vw,1.1rem);font-weight:300;letter-spacing:.05em;line-height:1.6;text-align:center;}
+
+    /* ── SLIDES 5+6: VISION ── */
+    .vis2{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+    .vk{background:var(--white);border-radius:4px;padding:1.4rem 1.2rem;border-top:3px solid var(--ocean);}
+    .slide--light .vk{background:var(--white);}
+    .slide--parchment .vk{background:var(--cream);}
+    .vk-icon{width:32px;height:32px;margin-bottom:.8rem;color:var(--ocean);}
+    .vk-h{font-family:'Cormorant Garamond',serif;font-size:1.28rem;font-weight:600;color:var(--bark);margin-bottom:.6rem;}
+    .vk-body ul{list-style:none;display:flex;flex-direction:column;gap:.38rem;padding:0;}
+    .vk-body li{font-size:.78rem;font-weight:300;line-height:1.6;color:var(--text-soft);padding-left:.85rem;position:relative;}
+    .vk-body li::before{content:'—';position:absolute;left:0;color:var(--ocean);}
+
+    /* ── SLIDE 7: REEL ── */
+    .reel-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:3rem;align-items:start;}
+    .reel-banner{background:linear-gradient(135deg,#2e1f0e,#5c3d2e);border-radius:4px 4px 0 0;padding:1.3rem 1.4rem 1.1rem;margin-bottom:1rem;}
+    .reel-type{font-size:.65rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-light);display:block;margin-bottom:.3rem;}
+    .reel-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.2rem;font-weight:300;color:var(--white);}
+    .c-head{font-family:'Cormorant Garamond',serif;font-size:1.28rem;font-weight:600;color:var(--bark);margin-bottom:.55rem;}
+    .c-txt{font-size:.81rem;font-weight:300;line-height:1.7;color:var(--text-soft);}
+    .c-txt+.c-txt{margin-top:.45rem;}
+    .sometimes{list-style:none;padding:0;display:flex;flex-direction:column;gap:.28rem;}
+    .sometimes li{font-size:.81rem;font-weight:300;font-style:italic;line-height:1.5;color:var(--text-soft);padding-left:.85rem;position:relative;}
+    .sometimes li::before{content:'○';position:absolute;left:0;color:var(--ocean);font-size:.55rem;top:.22rem;}
+    .reel-end{margin-top:.8rem;font-size:.81rem;font-weight:300;line-height:1.65;color:var(--text-soft);}
+
+    /* ── SLIDE 8: CONCEPTS 2+3 ── */
+    .c2grid{display:grid;grid-template-columns:1fr 1fr;gap:1.4rem;}
+    .ccard{background:var(--white);border-radius:4px;overflow:hidden;}
+    .slide--parchment .ccard{background:var(--cream);}
+    .cb1{background:linear-gradient(135deg,#1c3030,#3a5c50);}
+    .cb2{background:linear-gradient(135deg,#1a1208,#3d2b1f);}
+    .cbanner{padding:1.1rem 1.4rem;}
+    .c-type{font-size:.63rem;letter-spacing:.28em;text-transform:uppercase;color:var(--gold-light);display:block;margin-bottom:.28rem;}
+    .c-btitle{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:1.1rem;font-weight:300;color:var(--white);}
+    .cbody{padding:1.1rem 1.4rem;}
+    .c-bhead{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:600;color:var(--bark);margin-bottom:.45rem;}
+    .c-p{font-size:.78rem;font-weight:300;line-height:1.65;color:var(--text-soft);}
+    .c-p+.c-p{margin-top:.35rem;}
+    .c-slist{list-style:none;padding:0;margin-top:.55rem;display:flex;flex-direction:column;gap:.25rem;}
+    .c-sli{font-size:.76rem;font-weight:300;line-height:1.5;color:var(--text-soft);padding-left:.85rem;position:relative;}
+    .c-sli::before{content:'○';position:absolute;left:0;color:var(--ocean);font-size:.52rem;top:.2rem;}
+    .c-sli strong{font-size:.62rem;letter-spacing:.07em;text-transform:uppercase;color:var(--bark);font-style:normal;}
+
+    /* ── CONCEPT SLIDES (full-width banner) ── */
+    .con-slide{padding:0;justify-content:flex-start;align-items:stretch;}
+    .con-header{width:100%;padding:2rem 4rem 1rem;flex-shrink:0;}
+    .con-banner{width:100%;padding:2.2rem 4rem 2rem;flex-shrink:0;}
+    .cb-reel{background:linear-gradient(135deg,#2e1f0e,#5c3d2e);}
+    .cb-day{background:linear-gradient(135deg,#1c3030,#3a5c50);}
+    .cb-carousel{background:linear-gradient(135deg,#1a1208,#3d2b1f);}
+    .con-type{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-light);display:block;margin-bottom:.4rem;}
+    .con-title{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:clamp(1.5rem,3vw,2.2rem);color:var(--white);line-height:1.2;}
+    .con-body{flex:1;overflow-y:auto;padding:2rem 4rem 3rem;max-width:780px;margin:0 auto;width:100%;}
+    .con-body::-webkit-scrollbar{width:3px;}
+    .con-body::-webkit-scrollbar-thumb{background:var(--stone);border-radius:2px;}
+    .con-head{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--bark);margin-bottom:.7rem;}
+    .con-txt{font-size:.86rem;font-weight:300;line-height:1.75;color:var(--text-soft);}
+    .con-txt+.con-txt{margin-top:.5rem;}
+    .con-txt.italic{font-style:italic;}
+    .sometimes-2col{list-style:none;padding:0;margin-top:.8rem;column-count:2;column-gap:2.5rem;}
+    .sometimes-2col li{font-size:.86rem;font-weight:300;font-style:italic;line-height:1.6;color:var(--text-soft);padding-left:.9rem;position:relative;break-inside:avoid;margin-bottom:.3rem;}
+    .sometimes-2col li::before{content:'○';position:absolute;left:0;color:var(--ocean);font-size:.55rem;top:.25rem;}
+    .con-ending{margin-top:1rem;font-size:.86rem;font-weight:300;line-height:1.7;color:var(--text-soft);}
+    .con-list{list-style:none;padding:0;margin-top:.7rem;display:flex;flex-direction:column;gap:.45rem;}
+    .con-li{font-size:.86rem;font-weight:300;line-height:1.65;color:var(--text-soft);padding-left:1rem;position:relative;}
+    .con-li::before{content:'—';position:absolute;left:0;color:var(--ocean);}
+    .con-li strong{font-size:.72rem;letter-spacing:.07em;text-transform:uppercase;color:var(--bark);font-style:normal;}
+
+    /* ── SLIDE 9: CLOSING ── */
+    .cl-moon{width:50px;height:50px;margin-bottom:1.75rem;opacity:.7;}
+    .cl-quote{font-family:'Cormorant Garamond',serif;font-style:italic;font-weight:300;font-size:clamp(1.1rem,2.3vw,1.55rem);color:var(--sand);line-height:1.65;max-width:620px;margin:0 auto 1.75rem;text-align:center;}
+    .cl-author{font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;color:var(--stone);}
+    .cl-footer{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:#5c4a38;}
+
+    /* scrollbar */
+    .slide::-webkit-scrollbar{width:3px;}
+    .slide::-webkit-scrollbar-thumb{background:var(--stone);border-radius:2px;}
+  </style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ═══ SLIDE 1: COVER ═══ -->
+  <section class="slide slide--dark active" data-dark="1">
+    <svg class="hero-moon" viewBox="0 0 90 90" fill="none">
+      <circle cx="45" cy="45" r="44" stroke="#c9a84c" stroke-width="1" opacity=".4"/>
+      <path d="M45 8 C28 8 14 21 14 45 C14 69 28 82 45 82 C36 72 30 60 30 45 C30 30 36 18 45 8Z" fill="#c9a84c" opacity=".6"/>
+      <circle cx="45" cy="45" r="28" stroke="#c9a84c" stroke-width=".5" opacity=".2"/>
+    </svg>
+    <span class="h-tag">The Goddess Movement · Portfolio</span>
+    <h1 class="h-name">Erika Stekerhofa</h1>
+    <p class="h-role">Marketing · PR · Social Media · Content Creation</p>
+    <div class="h-div"></div>
+    <span class="h-sub">Social Media &amp; Content Creator · Application</span>
+    <p class="h-desc">
+      10 years in marketing.<br/>
+      Long-term Goddess Movement member.<br/>
+      Ready to bring the two together.
+    </p>
+  </section>
+
+  <!-- ═══ SLIDE 2: ABOUT ME ═══ -->
+  <section class="slide slide--parchment" data-dark="0">
+    <div class="inner">
+      <h2 class="s-title">About Me</h2>
+      <div class="s-rule"></div>
+      <div class="about-grid">
+        <div>
+          <p class="a-intro">I'm not approaching the Goddess Movement as an outsider trying to learn the brand. I've been part of the community for years.</p>
+          <p class="a-body">With a decade of experience in marketing, specializing in product marketing within international companies, I combine a strong understanding of brands with hands-on expertise in building positioning, content and campaigns that connect with audiences and drive results.</p>
+          <p class="a-body">My experience spans more than one industry: fashion, technology and aviation. Giving me a broad perspective on the different challenges and opportunities that come with marketing across industries. Working in international environments has also shaped the way I work — collaborating across countries, time zones and functions to bring ideas from strategy through to execution.</p>
+        </div>
+        <div class="stat-col">
+          <div class="stat-item">
+            <div class="stat-num">10</div><div class="stat-lbl">Years</div>
+            <div class="stat-sub">in Marketing</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">3</div><div class="stat-lbl">Industries</div>
+            <div class="stat-sub">Fashion · Tech · Aviation</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">2</div><div class="stat-lbl">Years</div>
+            <div class="stat-sub">as a TGM Community Member</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-num">1</div><div class="stat-lbl">Community</div>
+            <div class="stat-sub">that feels like sisterhood</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 3: WHAT I BRING ═══ -->
+  <section class="slide slide--light" data-dark="0">
+    <div class="inner">
+      <div class="bring-grid">
+        <div class="bring-left">
+          <h2 class="s-title" style="margin-bottom:.5rem;">What<br/>I Bring</h2>
+          <div class="s-rule" style="margin-bottom:0;"></div>
+          <svg class="bring-wave" width="64" height="44" viewBox="0 0 64 44" fill="none">
+            <path d="M2 10 C8 4,16 4,22 10 C28 16,36 16,42 10 C48 4,56 4,62 10" stroke="#7a9a8a" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M2 22 C8 16,16 16,22 22 C28 28,36 28,42 22 C48 16,56 16,62 22" stroke="#7a9a8a" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M2 34 C8 28,16 28,22 34 C28 40,36 40,42 34 C48 28,56 28,62 34" stroke="#7a9a8a" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <ul class="bring-list">
+          <li>Owning product positioning, messaging and go-to-market strategy</li>
+          <li>Leading end-to-end product launches, from strategy and messaging to campaigns and execution</li>
+          <li>Creating high-impact content across written and visual copy, landing pages, blogs, press releases and video</li>
+          <li>Building media relationships and demand-generation initiatives</li>
+          <li>Measuring marketing performance through adoption, engagement, pipeline and conversion</li>
+          <li>Acting as the voice of the market, bringing customer and competitive insights into product and business decisions</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 4: SKILLS & EXPERTISE ═══ -->
+  <section class="slide slide--parchment" data-dark="0">
+    <div class="inner">
+      <h2 class="s-title">Skills &amp; Expertise</h2>
+      <div class="s-rule"></div>
+      <div class="cards4">
+
+        <div class="pk">
+          <svg class="pk-icon" viewBox="0 0 40 40" fill="none">
+            <path d="M2 14 C6 8,12 8,16 14 C20 20,26 20,30 14 C34 8,38 8,38 14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M2 22 C6 16,12 16,16 22 C20 28,26 28,30 22 C34 16,38 16,38 22" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M2 30 C6 24,12 24,16 30 C20 36,26 36,30 30 C34 24,38 24,38 30" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <div class="pk-h">Strategy</div>
+          <div class="pk-tags">
+            <span class="pk-tag">Social Media Strategy</span><span class="pk-tag">Content Planning</span>
+            <span class="pk-tag">Campaign Strategy</span><span class="pk-tag">Brand Growth</span>
+          </div>
+        </div>
+
+        <div class="pk">
+          <svg class="pk-icon" viewBox="0 0 40 40" fill="none">
+            <path d="M20 20 C22 17,26 16,28 18 C31 21,29 27,25 29 C19 32,12 28,10 22 C8 14,14 6,22 6 C31 6,37 14,35 23 C33 32,24 38,14 36" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <circle cx="20" cy="20" r="2" fill="currentColor" opacity=".5"/>
+          </svg>
+          <div class="pk-h">Creative</div>
+          <div class="pk-tags">
+            <span class="pk-tag">Posts &amp; Reels</span><span class="pk-tag">Stories</span>
+            <span class="pk-tag">Visual Storytelling</span><span class="pk-tag">Graphic Design</span>
+            <span class="pk-tag">Trend-led Content</span>
+          </div>
+        </div>
+
+        <div class="pk">
+          <svg class="pk-icon" viewBox="0 0 40 40" fill="none">
+            <path d="M20 4 L22 18 L36 20 L22 22 L20 36 L18 22 L4 20 L18 18 Z" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M8 8 L8.7 11 L12 12 L8.7 13 L8 16 L7.3 13 L4 12 L7.3 11 Z" fill="currentColor" opacity=".5"/>
+            <path d="M32 6 L32.5 8.5 L35 9 L32.5 9.5 L32 12 L31.5 9.5 L29 9 L31.5 8.5 Z" fill="currentColor" opacity=".5"/>
+          </svg>
+          <div class="pk-h">Marketing</div>
+          <div class="pk-tags">
+            <span class="pk-tag">Campaigns</span><span class="pk-tag">Audience Insights</span>
+            <span class="pk-tag">Performance Optimization</span><span class="pk-tag">Paid Socials</span>
+          </div>
+        </div>
+
+        <div class="pk">
+          <svg class="pk-icon" viewBox="0 0 40 40" fill="none">
+            <path d="M20 38 L20 26 M20 26 L13 16 M13 16 L8 8 M13 16 L10 8 M20 26 L27 16 M27 16 L32 8 M27 16 L30 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+            <circle cx="8" cy="7" r="1.8" fill="currentColor" opacity=".6"/>
+            <circle cx="10" cy="7" r="1.4" fill="currentColor" opacity=".5"/>
+            <circle cx="32" cy="7" r="1.8" fill="currentColor" opacity=".6"/>
+            <circle cx="30" cy="7" r="1.4" fill="currentColor" opacity=".5"/>
+          </svg>
+          <div class="pk-h">Execution</div>
+          <div class="pk-tags">
+            <span class="pk-tag">Content Calendars</span><span class="pk-tag">Scheduling</span>
+            <span class="pk-tag">Strategy Implementation</span><span class="pk-tag">Graphic Content Creation</span>
+          </div>
+        </div>
+
+      </div>
+      <div class="skills-footer">
+        I blend strategic marketing thinking with a strong sense of visual storytelling and hands-on creative execution, turning narrative into meaningful brand experiences that connect with people.
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 5: VISION — MOVE + LIVE ═══ -->
+  <section class="slide slide--light" data-dark="0">
+    <div class="inner">
+      <h2 class="s-title">The Goddess Movement: beyond the existing</h2>
+      <p class="s-sub">What to focus on more</p>
+      <div class="s-rule"></div>
+      <div class="vis2">
+
+        <div class="vk">
+          <svg class="vk-icon" viewBox="0 0 40 40" fill="none">
+            <path d="M28 20 C28 26.6 22.6 32 16 32 C13.2 32 10.6 31 8.6 29.4 C11 31.6 14.4 33 18 33 C25.7 33 32 26.7 32 19 C32 13.2 28.4 8.2 23.2 6 C26.2 9.2 28 13.9 28 20Z" stroke="currentColor" stroke-width="1.2"/>
+            <circle cx="20" cy="10" r="1.5" fill="currentColor" opacity=".5"/>
+            <circle cx="10" cy="20" r="1" fill="currentColor" opacity=".4"/>
+            <circle cx="20" cy="30" r="1.5" fill="currentColor" opacity=".5"/>
+          </svg>
+          <div class="vk-h">Move</div>
+          <div class="vk-body"><ul>
+            <li>Share more short, pre-recorded workout routines that are easy to follow and recreate at home.</li>
+            <li>Create exercise how-to content focused on correct form, common mistakes and simple modifications.</li>
+            <li>Show progressions for more advanced exercises, helping the audience build confidence step by step.</li>
+            <li>Bring back short exercise challenges with 4–5 exercises, encouraging the community to participate and share in the comments.</li>
+            <li>Use challenges as a way to create more interaction and accountability, similar to the energy in TGM community chats.</li>
+          </ul></div>
+        </div>
+
+        <div class="vk">
+          <svg class="vk-icon" viewBox="0 0 40 40" fill="none">
+            <path d="M20 30 C20 30 12 24 12 16 C12 11 15.6 8 20 8 C24.4 8 28 11 28 16 C28 24 20 30 20 30Z" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M20 30 C20 30 8 26 6 18 C5 13 8 9 12 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M20 30 C20 30 32 26 34 18 C35 13 32 9 28 10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M20 30 L20 36" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <div class="vk-h">Live</div>
+          <div class="vk-body"><ul>
+            <li>Bring more behind-the-scenes content from TGM classes, events and expert sessions.</li>
+            <li>Turn expert-led Lives into bite-sized educational content, sharing useful insights beyond nutrition.</li>
+            <li>Give more visibility to the experts and practitioners behind TGM, while encouraging them to share their TGM experience with their own audiences.</li>
+            <li>Explore more seasonal wellness and nourishing rituals that fit naturally into everyday life.</li>
+            <li>Expand beyond workouts with more content around wellness, rituals, recovery, mindset and everyday wellbeing.</li>
+          </ul></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 6: VISION — CONNECT + INSPIRE ═══ -->
+  <section class="slide slide--parchment" data-dark="0">
+    <div class="inner">
+      <h2 class="s-title">The Goddess Movement: beyond the existing</h2>
+      <p class="s-sub">What to focus on more</p>
+      <div class="s-rule"></div>
+      <div class="vis2">
+
+        <div class="vk">
+          <svg class="vk-icon" viewBox="0 0 40 40" fill="none">
+            <path d="M20 14 C20 14 17 10 13 12 C10 14 10 18 13 20 L20 28 L27 20 C30 18 30 14 27 12 C23 10 20 14 20 14Z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/>
+            <path d="M14 32 C14 32 16 30 20 30 C24 30 26 32 26 32" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M10 36 C10 36 14 34 20 34 C26 34 30 36 30 36" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <div class="vk-h">Connect</div>
+          <div class="vk-body"><ul>
+            <li>Bring back TGM Spotlight to celebrate the women who make the community what it is.</li>
+            <li>Bring the TGM community chat to social media — challenges, conversations, wellness tips, personal wins and advice that can resonate with a wider audience.</li>
+            <li>Show how TGM girls connect in real life and demonstrate that the community is about more than simply doing workouts together.</li>
+            <li>Share more testimonials, personal stories and UGC to let members speak authentically about what TGM means to them.</li>
+            <li>Showcase the sisterhood, support and personal connections that make TGM feel like a community rather than just a fitness platform.</li>
+          </ul></div>
+        </div>
+
+        <div class="vk">
+          <svg class="vk-icon" viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="7" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M20 4 L20 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M20 32 L20 36" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M4 20 L8 20" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M32 20 L36 20" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M8.6 8.6 L11.4 11.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M28.6 28.6 L31.4 31.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M31.4 8.6 L28.6 11.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M11.4 28.6 L8.6 31.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+          <div class="vk-h">Inspire</div>
+          <div class="vk-body"><ul>
+            <li>Tell more aspirational stories about TGM as a journey back to yourself, rather than focusing only on movement or wellness.</li>
+            <li>Show that there is no single way to experience TGM — everyone can find the tools that resonate with them, whether that is movement, nutrition, wellness, community or simply a moment of support.</li>
+            <li>Celebrate the different ways women connect with TGM and make the platform their own.</li>
+            <li>Create content that communicates the idea that TGM looks different on everyone — and that is exactly what makes it beautiful.</li>
+            <li>Position barre and movement as one expression of the Goddess Movement: moving through life with more love, confidence, connection and harmony.</li>
+          </ul></div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 7: CONCEPT 1 — REEL ═══ -->
+  <section class="slide slide--light con-slide" data-dark="0">
+    <div class="con-header">
+      <h2 class="s-title">Content Concepts</h2>
+      <div class="s-rule"></div>
+    </div>
+    <div class="con-banner cb-reel">
+      <span class="con-type">Reel</span>
+      <h2 class="con-title">"A Goddess doesn't always workout"</h2>
+    </div>
+    <div class="con-body">
+      <div class="con-head">She Already Is.</div>
+      <p class="con-txt">A cinematic reel showing the many ways a woman can move through life beyond exercise — through rest, saying no, dancing, connecting, taking up space, slowing down and starting again.</p>
+      <p class="con-txt">Each moment brings a line of copy to life with matching visuals:</p>
+      <ul class="sometimes-2col">
+        <li>Sometimes she rests.</li>
+        <li>Sometimes she says no.</li>
+        <li>Sometimes she changes her mind.</li>
+        <li>Sometimes she dances simply because she can.</li>
+        <li>Sometimes she rests beneath the sunset.</li>
+        <li>Sometimes she follows the moon.</li>
+        <li>Sometimes she lets the light find her.</li>
+        <li>Sometimes she takes up all the space she needs.</li>
+        <li>Sometimes she lets herself be held.</li>
+        <li>Sometimes she starts again.</li>
+      </ul>
+      <div class="con-ending">
+        <p style="font-style:italic;margin-bottom:.35rem;">And sometimes… she moves.</p>
+        <p>The reel ends with:<br/><em>Not to become worthy. Because she already is.</em></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 8: CONCEPT 2 — THE GODDESS DAY ═══ -->
+  <section class="slide slide--parchment con-slide" data-dark="0">
+    <div class="con-header">
+      <h2 class="s-title">Content Concepts</h2>
+      <div class="s-rule"></div>
+    </div>
+    <div class="con-banner cb-day">
+      <span class="con-type">Lifestyle Carousel</span>
+      <h2 class="con-title">"The Goddess Day"</h2>
+    </div>
+    <div class="con-body">
+      <div class="con-head">The Goddess Day</div>
+      <p class="con-txt">A beautiful editorial-style post showing how to have a goddess day.</p>
+      <p class="con-txt italic">Instead of asking "What do I need to achieve today", ask "What am I longing for?"</p>
+      <p class="con-txt">A lifestyle carousel showing that being a Goddess is about how you live, not just how you move. Instead of focusing on a workout, we follow a woman through small moments of her day:</p>
+      <ul class="con-list" style="margin-top:.9rem;">
+        <li class="con-li">Nourishing — eating something that feels good.</li>
+        <li class="con-li">Connecting — spending time with friends.</li>
+        <li class="con-li">Creating — making space for her passions (music, arts &amp; crafts, reading etc.)</li>
+        <li class="con-li">Resting — slowing down without guilt.</li>
+        <li class="con-li">Reflecting — checking in with herself (journaling, meditation)</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 9: CONCEPT 3 — CAROUSEL ═══ -->
+  <section class="slide slide--light con-slide" data-dark="0">
+    <div class="con-header">
+      <h2 class="s-title">Content Concepts</h2>
+      <div class="s-rule"></div>
+    </div>
+    <div class="con-banner cb-carousel">
+      <span class="con-type">Reflective Carousel</span>
+      <h2 class="con-title">"What Are You Moving Through?"</h2>
+    </div>
+    <div class="con-body">
+      <div class="con-head">Move With Your Cycle. Move With Love.</div>
+      <p class="con-txt">A carousel encouraging women to check in with their cycle, energy and life — and choose how they want to show up, rather than forcing themselves into the same routine every day.</p>
+      <ul class="con-list" style="margin-top:.9rem;">
+        <li class="con-li"><strong>Slide 1</strong><br/>What are you moving through?</li>
+        <li class="con-li"><strong>Slide 2</strong><br/>Some days you want to push forward. Some days you need to slow down.</li>
+        <li class="con-li"><strong>Slide 3</strong><br/>Some days are for being seen. Some are for coming back to yourself.</li>
+        <li class="con-li"><strong>Slide 4</strong><br/>Some days you need community. Some days you need space.</li>
+        <li class="con-li"><strong>Slide 5</strong><br/>Some days your body wants to move. Some days it wants to rest.</li>
+        <li class="con-li"><strong>Slide 6</strong><br/>The Goddess Movement isn't about doing the same thing every day. It's about listening to what you need.</li>
+        <li class="con-li" style="font-style:italic;">Visuals can have our own TGM goddesses featured doing a certain activity.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 9: CLOSING ═══ -->
+  <section class="slide slide--dark" data-dark="1">
+    <svg class="cl-moon" viewBox="0 0 60 60" fill="none">
+      <circle cx="30" cy="30" r="28" stroke="#c9a84c" stroke-width=".8" opacity=".5"/>
+      <path d="M30 6 C18 6 8 16 8 30 C8 44 18 54 30 54 C24 46 20 38 20 30 C20 22 24 14 30 6Z" fill="#c9a84c" opacity=".5"/>
+    </svg>
+    <blockquote class="cl-quote">
+      Being a Goddess isn't another thing to add to your to-do list.<br/>
+      It's the way you move through the life you're already living.<br/><br/>
+      Don't just show women how to move their bodies.<br/>
+      Show them how to move through life.
+    </blockquote>
+    <p class="cl-author">Erika Stekerhofa · The Goddess Movement</p>
+    <p class="cl-footer">Portfolio by Erika Stekerhofa &nbsp;·&nbsp; 2026</p>
+  </section>
+
+</div>
+
+<!-- ── NAVIGATION ── -->
+<button class="nav-btn" id="prevBtn" title="Previous">
+  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2 L4 7 L9 12"/></svg>
+</button>
+<button class="nav-btn" id="nextBtn" title="Next">
+  <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 2 L10 7 L5 12"/></svg>
+</button>
+<div class="dots" id="dotsEl"></div>
+<div id="counter"></div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const dotsEl = document.getElementById('dotsEl');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const counter = document.getElementById('counter');
+  let cur = 0, busy = false;
+
+  slides.forEach((_,i) => {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i===0?' on':'');
+    d.setAttribute('aria-label','Slide '+(i+1));
+    d.addEventListener('click', () => go(i));
+    dotsEl.appendChild(d);
+  });
+
+  function ui() {
+    dotsEl.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('on', i===cur));
+    prevBtn.classList.toggle('off', cur===0);
+    nextBtn.classList.toggle('off', cur===slides.length-1);
+    counter.textContent = (cur+1) + ' / ' + slides.length;
+    document.body.classList.toggle('dark-ui', slides[cur].dataset.dark==='1');
+  }
+
+  function go(n) {
+    if (busy || n===cur || n<0 || n>=slides.length) return;
+    busy = true;
+    const dir = n > cur ? 1 : -1;
+    const from = slides[cur], to = slides[n];
+
+    to.style.transition = 'none';
+    to.style.transform = dir>0 ? 'translateX(100%)' : 'translateX(-100%)';
+    to.style.opacity = '1';
+    to.classList.add('active');
+    to.getBoundingClientRect(); // reflow
+
+    to.style.transition = '';
+    to.style.transform = 'translateX(0)';
+    from.style.transform = dir>0 ? 'translateX(-100%)' : 'translateX(100%)';
+    from.style.opacity = '0';
+
+    setTimeout(() => {
+      from.classList.remove('active');
+      ['transform','opacity','transition'].forEach(p => {
+        from.style[p] = '';
+        to.style[p] = '';
+      });
+      cur = n; busy = false; ui();
+    }, 620);
+  }
+
+  prevBtn.addEventListener('click', () => go(cur-1));
+  nextBtn.addEventListener('click', () => go(cur+1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key==='ArrowRight'||e.key==='ArrowDown') go(cur+1);
+    else if (e.key==='ArrowLeft'||e.key==='ArrowUp') go(cur-1);
+  });
+
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) go(dx < 0 ? cur+1 : cur-1);
+  });
+
+  ui();
+</script>
+</body>
+</html>
